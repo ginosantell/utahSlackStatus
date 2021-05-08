@@ -1,10 +1,12 @@
 #!/usr/local/bin
 <?php
 
+http_response_code(200);
+
 define('TOKEN', getenv('TOKEN'));
 define('CHANNEL', getenv('CHANNEL'));
 
-http_response_code(301);
+# http_response_code(301);
 
  // Grab event data from the request
 $input = $_POST['body'];
