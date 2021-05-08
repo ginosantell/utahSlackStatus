@@ -1,4 +1,6 @@
-<?
+#!/usr/local/bin
+<?php
+
 define('TOKEN', getenv('TOKEN'));
 define('CHANNEL', getenv('CHANNEL'));
 
@@ -110,5 +112,5 @@ function postMessage($payload) {
 
 
 
-
+?>
   
