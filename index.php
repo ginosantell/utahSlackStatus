@@ -2,6 +2,7 @@
 <?php
 
 http_response_code(200);
+print "Test";
 
 define('TOKEN', getenv('TOKEN'));
 define('CHANNEL', getenv('CHANNEL'));
@@ -9,15 +10,19 @@ define('CHANNEL', getenv('CHANNEL'));
 # http_response_code(301);
 
  // Grab event data from the request
-$input = $_POST['body'];
+# $input = $_POST['body'];
+$input = file_get_contents('php://input');
 $json = json_decode($input, FALSE);
 $type = $json->type;
 
+print "$json->type:" . $json->type;
+print "$json->token:" . $json->token;
+print "$json->challenge:" . $json->challenge;
 
 switch ($type) {
 
-  case 'url_verification':
-
+  case "url_verification":
+    print "Here url_verificatin";
     $challenge = isset($json->challenge) ? $json->challenge : null;
     $response = array(
       'challenge' => $challenge,
@@ -25,10 +30,9 @@ switch ($type) {
     header('Content-type: application/json');
     print $response;
 
-
   break;
 
-  case 'event_callback':
+  case "event_callback":
 
     switch ($json->event->type) {
 
@@ -52,7 +56,7 @@ switch ($type) {
           $message = [
             "pretext" => $username . " updated their status:",
             "text" => $status_emoji . " *" . $status_text,
-          ];
+      ];
         }
 
         // send the message!
@@ -91,10 +95,10 @@ function postMessage($payload) {
     $callurl = "https://slack.com/api/chat.postMessage" . "?" . $args;
 
     // Let's build a cURL query.
-  	$ch = curl_init($callurl);
-  	curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
-  	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        $ch = curl_init($callurl);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
     if (array_key_exists("filename", $payload)) {
       $callurl = $url . $method;
@@ -109,9 +113,8 @@ function postMessage($payload) {
     if ($ch_response->ok == FALSE) {
       error_log($ch_response->error);
     }
- }
+}
 
 
 
 ?>
-  
