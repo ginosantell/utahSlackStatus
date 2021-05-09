@@ -2,41 +2,29 @@
 <?php
 
 http_response_code(200);
-print "Test\n";
 
 define('TOKEN', getenv('TOKEN'));
 define('CHANNEL', getenv('CHANNEL'));
 
-# http_response_code(301);
+#http_response_code(301);
 
- // Grab event data from the request
-# $input = $_POST['body'];
+// Grab event data from the request
+#$input = $_POST['body'];
 $input = file_get_contents('php://input');
-$json = json_decode($input, FALSE);
+$json = json_decode($input, false);
 $type = $json->type;
 
-print "Here 10\n";
-print "json->type:" . $json->type;
-
-print "\nHere 20\n";
-print "json->token:" . $json->token;
-
-print "\nHere 30\n";
-print "json->challenge:" . $json->challenge;
-
-print "\nHere 40\n";
-#print "json->event:" . $json->event;
-
-print "\n";
-print "json->event->type:" . $json["event"]["type"];
+print "Here 10.111\n";
+#print_r($json);
+#print "var_dump:\n";
+#print var_dump($json);
+print "type: " . $type;
 print "\nHere 50\n";
-
-print "$json->event[type]:" . $json->event[type];
-print "\nHere 60.";
+print "json->event->type: " . $json->event->type;
 
 switch ($type) {
 
-  case "url_verification":
+  case 'url_verification':
 
     $challenge = isset($json->challenge) ? $json->challenge : null;
     $response = array(
@@ -44,22 +32,51 @@ switch ($type) {
     );
     header('Content-type: application/json');
     print $response;
-    break;
 
-  case "event_callback":
+  break;
+
+  case 'event_callback':
 
     switch ($json->event->type) {
 
-      case "user_change":
+      case 'user_change':
 
-       $message = [
+        // Grab some data about the user;
+        /*
+        $userid = $json->event->user->id;
+        $username = $json->event->user->real_name_normalized;
+        $status_text = $json->event->user->profile->status_text;
+        $status_emoji = $json->event->user->profile->status_emoji;
+        */
+
+        // Build the message payload
+
+        // If their status contains some text
+        /*
+        if (isset($status_text) && strlen($status_text) == 0) {
+          $message = [
+            'text' => $username . " cleared their status.",
+          ];
+        } else {
+          $message = [
+            "pretext" => $username . " updated their status:",
+            "text" => $status_emoji . " *" . $status_text,
+          ];
+        }
+        */
+
+        // send the message!
+        print "writing message...\n";
+        $message = [
          "text" => "Hello world"
-       ];
-
-       $attachments = [
-          $message
         ];
-
+        
+        print "writing attachments...\n";
+        $attachments = [
+          $message,
+        ];
+        
+        print "writing payload...\n";
         $payload = [
           #'token' => TOKEN,
           'token' => "lI6wukbUxKGwQavMYSdIIXtX",
@@ -68,13 +85,8 @@ switch ($type) {
           'attachments' => $attachments
         ];
 
-        $args = http_build_query($payload);
-        $callurl = "https://slack.com/api/chat.postMessage" . "?" . $args;
-
-
-        $ch = curl_init();
-        curl_exec($ch);
-        curl_close();
+        print "before postMessage.\n";
+        postMessage($payload);
 
       break;
 
@@ -82,4 +94,41 @@ switch ($type) {
 
 }
 
+
+
+
+function postMessage($payload) {
+
+    // Make a cURL call
+
+    // add our payload passed through the function.
+    $args = http_build_query($payload);
+
+    // Build the full URL call to the API.
+    $callurl = "https://slack.com/api/chat.postMessage" . "?" . $args;
+
+    // Let's build a cURL query.
+  	$ch = curl_init($callurl);
+  	curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
+  	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+    /*
+    if (array_key_exists("filename", $payload)) {
+      $callurl = $url . $method;
+      $headers = array("Content-Type: multipart/form-data"); // cURL headers for file uploading
+      curl_setopt($ch, CURLOPT_HEADER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+      curl_setopt($ch, CURLOPT_POST, 1);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    }
+    */
+    
+    print "before curl_exec\n";
+    
+    $ch_response = json_decode(curl_exec($ch));
+    if ($ch_response->ok == FALSE) {
+      error_log($ch_response->error);
+    }
+ }
 ?>
