@@ -55,27 +55,34 @@ switch ($type) {
           $message = [
             "text" => $username . " cleared their status.",
           ];
+          ];
            }
         */
 
         // send the message!
         print "writing message...\n";
         $message = [
+         "pretext" => "pretext string.",
          "text" => "Hello world"
         ];
 
         print "writing attachments...\n";
+        $message_json = json_encode($message);
+
+        /*
         $attachments = [
           $message,
         ];
+        */
 
         print "writing payload...\n";
+
         $payload = [
           #'token' => TOKEN,
           'token' => "lI6wukbUxKGwQavMYSdIIXtX",
           #'channel' => CHANNEL,
           'channel' => "C021A8J853L",
-          'attachments' => $attachments
+          'attachments' => $message_json
         ];
 
         print "before postMessage.\n";
@@ -92,7 +99,11 @@ function postMessage($payload) {
     // Make a cURL call
 
     // add our payload passed through the function.
+#    $attachment_json = json_encode($payload);
+#    $args = http_build_query($attachment_json);
     $args = http_build_query($payload);
+
+    print "before callurl...\n";
 
     // Build the full URL call to the API.
     $callurl = "https://slack.com/api/chat.postMessage" . "?" . $args;
@@ -100,7 +111,7 @@ function postMessage($payload) {
     print "callurl: " . $callurl . "\n";
 
     // Let's build a cURL query.
-        $ch = curl_init($callurl);
+          $ch = curl_init($callurl);
         curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
@@ -116,7 +127,7 @@ function postMessage($payload) {
       curl_setopt($ch, CURLOPT_POST, 1);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
     }
-   
+
     print "before curl_exec\n";
 
     $ch_response = json_decode(curl_exec($ch));
