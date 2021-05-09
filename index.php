@@ -14,13 +14,13 @@ $input = file_get_contents('php://input');
 $json = json_decode($input, false);
 $type = $json->type;
 
-print "Here 10.111\n";
+print "Here 10.118\n";
 #print_r($json);
 #print "var_dump:\n";
 #print var_dump($json);
 print "type: " . $type;
 print "\nHere 50\n";
-print "json->event->type: " . $json->event->type;
+print "json->event->type: " . $json->event->type . "\n";
 
 switch ($type) {
 
@@ -42,12 +42,10 @@ switch ($type) {
       case 'user_change':
 
         // Grab some data about the user;
-        /*
         $userid = $json->event->user->id;
         $username = $json->event->user->real_name_normalized;
         $status_text = $json->event->user->profile->status_text;
         $status_emoji = $json->event->user->profile->status_emoji;
-        */
 
         // Build the message payload
 
@@ -55,14 +53,9 @@ switch ($type) {
         /*
         if (isset($status_text) && strlen($status_text) == 0) {
           $message = [
-            'text' => $username . " cleared their status.",
+            "text" => $username . " cleared their status.",
           ];
-        } else {
-          $message = [
-            "pretext" => $username . " updated their status:",
-            "text" => $status_emoji . " *" . $status_text,
-          ];
-        }
+           }
         */
 
         // send the message!
@@ -70,12 +63,12 @@ switch ($type) {
         $message = [
          "text" => "Hello world"
         ];
-        
+
         print "writing attachments...\n";
         $attachments = [
           $message,
         ];
-        
+
         print "writing payload...\n";
         $payload = [
           #'token' => TOKEN,
@@ -94,9 +87,6 @@ switch ($type) {
 
 }
 
-
-
-
 function postMessage($payload) {
 
     // Make a cURL call
@@ -107,14 +97,18 @@ function postMessage($payload) {
     // Build the full URL call to the API.
     $callurl = "https://slack.com/api/chat.postMessage" . "?" . $args;
 
-    // Let's build a cURL query.
-  	$ch = curl_init($callurl);
-  	curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
-  	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+    print "callurl: " . $callurl . "\n";
 
-    /*
+    // Let's build a cURL query.
+        $ch = curl_init($callurl);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+    print "before array_key_exists\n";
+
     if (array_key_exists("filename", $payload)) {
+      print "inside array_key_exists\n";
       $callurl = $url . $method;
       $headers = array("Content-Type: multipart/form-data"); // cURL headers for file uploading
       curl_setopt($ch, CURLOPT_HEADER, true);
@@ -122,13 +116,18 @@ function postMessage($payload) {
       curl_setopt($ch, CURLOPT_POST, 1);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
     }
-    */
-    
+   
     print "before curl_exec\n";
-    
+
     $ch_response = json_decode(curl_exec($ch));
     if ($ch_response->ok == FALSE) {
       error_log($ch_response->error);
+      print "There was an error: \n";
+      print_r($ch_response);
+    } else {
+       print "after curl_exec\n";
     }
+
  }
+
 ?>
