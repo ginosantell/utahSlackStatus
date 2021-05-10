@@ -48,38 +48,33 @@ switch ($type) {
         $status_emoji = $json->event->user->profile->status_emoji;
 
         // Build the message payload
-
         // If their status contains some text
-        /*
         if (isset($status_text) && strlen($status_text) == 0) {
           $message = [
-            "text" => $username . " cleared their status.",
+            'text' => $username . " cleared their status.",
           ];
-           }
-        */
+        } else {
+          $message = [
+            "pretext" => $username . " updated their status:",
+            "text" => $status_emoji . " *" . $status_text,
+          ];
+        }
 
         // send the message!
-        print "writing message...\n";
-        $message = [
-         "pretext" => "pretext string.",
-         "text" => "Hello world"
-        ];
 
         print "writing attachments...\n";
         $message_json = json_encode($message);
-
+        print "after JSON-encoding";
         /*
         $attachments = [
-          $message,
+          $message_json,
         ];
         */
-
         print "writing payload...\n";
 
         $payload = [
-          #'token' => TOKEN,
           'channel' => CHANNEL,
-          #'channel' => "C021A8J853L",
+          'text' => $message_json,
           'attachments' => $message_json
         ];
 
@@ -97,8 +92,6 @@ function postMessage($payload) {
     // Make a cURL call
 
     // add our payload passed through the function.
-#    $attachment_json = json_encode($payload);
-#    $args = http_build_query($attachment_json);
     $args = http_build_query($payload);
 
     print "before callurl...\n";
@@ -107,14 +100,14 @@ function postMessage($payload) {
     $callurl = "https://slack.com/api/chat.postMessage" . "?" . $args;
 
     print "callurl: " . $callurl . "\n";
-
     // Let's build a cURL query.
-        $ch = curl_init($callurl);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        $headers = array("Authorization: Bearer " . TOKEN);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+    $ch = curl_init($callurl);
+    curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+    $headers = array("Authorization: Bearer " . TOKEN);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
     print "before array_key_exists\n";
 
