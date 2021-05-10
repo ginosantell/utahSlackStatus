@@ -55,7 +55,6 @@ switch ($type) {
           $message = [
             "text" => $username . " cleared their status.",
           ];
-          ];
            }
         */
 
@@ -79,9 +78,8 @@ switch ($type) {
 
         $payload = [
           #'token' => TOKEN,
-          'token' => "lI6wukbUxKGwQavMYSdIIXtX",
-          #'channel' => CHANNEL,
-          'channel' => "C021A8J853L",
+          'channel' => CHANNEL,
+          #'channel' => "C021A8J853L",
           'attachments' => $message_json
         ];
 
@@ -111,17 +109,18 @@ function postMessage($payload) {
     print "callurl: " . $callurl . "\n";
 
     // Let's build a cURL query.
-          $ch = curl_init($callurl);
+        $ch = curl_init($callurl);
         curl_setopt($ch, CURLOPT_USERAGENT, "Slack Technical Exercise");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, "Authorization: Bearer " . TOKEN);
 
     print "before array_key_exists\n";
 
     if (array_key_exists("filename", $payload)) {
       print "inside array_key_exists\n";
       $callurl = $url . $method;
-      $headers = array("Content-Type: multipart/form-data"); // cURL headers for file uploading
+      $headers = array("Content-Type: multipart/form-data","Authorization:".TOKEN); // cURL headers for file uploading
       curl_setopt($ch, CURLOPT_HEADER, true);
       curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
       curl_setopt($ch, CURLOPT_POST, 1);
@@ -135,7 +134,7 @@ function postMessage($payload) {
       error_log($ch_response->error);
       print "There was an error: \n";
       print_r($ch_response);
-    } else {
+} else {
        print "after curl_exec\n";
     }
 
